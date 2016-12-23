@@ -1,14 +1,16 @@
 const ex = require('express'),
       app = ex(),
       mongoose = require('mongoose'),
-      hahas = require('./models/hahas');
+      teamsModel = require('./models/teams');
 
 mongoose.connect('mongodb://localhost:27017/ty');
-let db = mongoose.connection;
+var db = mongoose.connection,
+    url = 'https://nba.hupu.com/players';
 
-// app.set('view engine','html')
-db.on('error',console.error.bind(console,'connect error'));
-db.once('open',()=>console.log('suc'))
 
 app.listen(3000)
 console.log('tangyang start');
+
+app.get('/',(req,res) => {
+    teamsModel.findAllteams(url);
+})
