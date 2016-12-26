@@ -3,19 +3,16 @@ const mongoose = require('mongoose'),
       https = require('https');
 
 let teamsSchma = new mongoose.Schema({
-    type : String,
-    teams : [{
       name : String,
       detail : String,
       icon : String
-    }]
 },{collection : 'nbaTeams'})
 
 teamsSchma.statics = {
     findAllteams(url) {
         var teamsModel = this;
 
-        teamsModel.find({type : 'teams'},(err,data) => {
+        teamsModel.find({},(err,data) => {
             console.log('20',data)
 
             if(!data.length){
@@ -39,20 +36,13 @@ teamsSchma.statics = {
                                 let teamDetail = {
                                     name : $(team[p]).find('.team_name a').text(),
                                     detail :　$(team[p]).find('.team_name a').attr('href'),
-                                    icon : $(team[p]).find('.on img').attr('src')
+                                    icon : $(team[p]).find('img').attr('src')
                                 }
-                                teamsArr.push(teamDetail)
+                                console.log(teamDetail)
+                                let teamEntity = new teamsModel(teamDetail)
+                                teamEntity.save();
                               }
-
                           }
-
-                        console.log('39',teamsArr.length)
-                        var teamEntity = new teamsModel({
-                            type : 'teams',
-                            teams : teamsArr
-                        })
-
-                        teamEntity.save();
                     })
                 })
             }
