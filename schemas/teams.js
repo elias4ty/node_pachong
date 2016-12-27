@@ -45,6 +45,10 @@ teamsSchma.statics = {
                           }
                     })
                 })
+
+                return false
+            }else{
+               return data
             }
         })
     }
