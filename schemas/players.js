@@ -17,13 +17,20 @@ let playerSchema = new mongoose.Schema({
 },{collection:'nbaPlayers'});
 
 playerSchema.statics = {
-  * findPlayers (ins){
-     if(ins<arr.length){
-       yield this.getPlayer(arr[ins].detail,ins)
+  findPlayers (arr){
+     var ins = 0,that = this;
+     console.log('22')
+     return {
+       goNext() {
+         if(ins<arr.length){
+           console.log('ins=',ins)
+           that.getPlayer.call(this,that,arr[ins++].detail)
+         }
+       }
      }
-  }
-  getPlayer(u,i) {
-      var html = '',playersModel = this;
+  },
+  getPlayer(p,u) {
+      var html = '',playersModel = p,that = this;
       console.log(u)
       https.get(u,(res) => {
           var teamName = u.split('/');
@@ -49,14 +56,15 @@ playerSchema.statics = {
                       };
                   players.push(playerObj);
               }
-              console.log(teamName[teamName.lenth - 1])
-              this.findPlayers(++i).next();
-              /*var playersEntity = new playersModel({
-                  teamName : teamName[teamName.lenth - 1],
+              console.log(teamName[teamName.length - 1])
+              that.goNext();
+              
+              var playersEntity = new playersModel({
+                  teamName : teamName[teamName.length - 1],
                   players : players
               })
 
-              playersEntity.save();*/
+              playersEntity.save();
           })
       })
   }
