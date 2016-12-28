@@ -12,45 +12,39 @@ teamsSchma.statics = {
     findAllteams(url) {
         var teamsModel = this;
 
-        teamsModel.find({},(err,data) => {
-            console.log('20',data)
+        return new Promise((resolve,reject) => {
+              https.get(url,(teamsData) => {
+                  var html = '';
+                  teamsData.on('data',(d) => {
+                      html+=d
+                  })
 
-            if(!data.length){
-                var html = '';
-                https.get(url,(teamsData) => {
+                  teamsData.on('end',() => {
+                      let $ = cheerio.load(html),
+                          teamlist = $('.players_list'),
+                          teamsArr = [];
+                      console.log(teamlist.length,'29')
 
-                    teamsData.on('data',(d) => {
-                        html+=d
-                    })
+                        for(let t=0;t<teamlist.length;t++){
+                            var team = $(teamlist[t]).children('li');
 
-                    teamsData.on('end',() => {
-                        let $ = cheerio.load(html),
-                            teamlist = $('.players_list'),
-                            teamsArr = [];
-                        console.log(teamlist.length,'29')
-
-                          for(let t=0;t<teamlist.length;t++){
-                              var team = $(teamlist[t]).children('li');
-
-                              for(let p=0;p<team.length;p++){
-                                let teamDetail = {
-                                    name : $(team[p]).find('.team_name a').text(),
-                                    detail :　$(team[p]).find('.team_name a').attr('href'),
-                                    icon : $(team[p]).find('img').attr('src')
-                                }
-                                console.log(teamDetail)
-                                let teamEntity = new teamsModel(teamDetail)
-                                teamEntity.save();
+                            for(let p=0;p<team.length;p++){
+                              let teamDetail = {
+                                  name : $(team[p]).find('.team_name a').text(),
+                                  detail :　$(team[p]).find('.team_name a').attr('href'),
+                                  icon : $(team[p]).find('img').attr('src')
                               }
-                          }
-                    })
-                })
-
-                return false
-            }else{
-               return data
-            }
+                              console.log(teamDetail)
+                              let teamEntity = new teamsModel(teamDetail)
+                              teamEntity.save();
+                              teamsArr.push(teamDetail);
+                            }
+                        }
+                        resolve(teamsArr);
+                  })
+              })
         })
+
     }
 }
 module.exports = teamsSchma

@@ -58,7 +58,7 @@ playerSchema.statics = {
               }
               console.log(teamName[teamName.length - 1])
               that.goNext();
-              
+
               var playersEntity = new playersModel({
                   teamName : teamName[teamName.length - 1],
                   players : players
@@ -67,6 +67,16 @@ playerSchema.statics = {
               playersEntity.save();
           })
       })
+  },
+  valid(ts) {
+    this.find({},(err,data) => {
+        console.log('找到',data.length,'支球队的球员')
+        if(!data.length){
+          console.log('ts=',ts.length)
+          var iterator = this.findPlayers(ts);
+          iterator.goNext();
+        }
+    })
   }
 }
 
