@@ -15,7 +15,6 @@ app.listen(3000)
 console.log('tangyang start');
 
 app.get('/',(req,res) => {
-
     new Promise((resolve,reject) => {
        teamsModel.find({},(err,data) => {
             if(!data.length){
@@ -29,9 +28,13 @@ app.get('/',(req,res) => {
         playersModel.valid(data)
     },(url) => {
         console.log('no nbaTeams')
-        teamsModel.findAllteams(url);
+        return teamsModel.findAllteams(url)
     }).then((data) => {
-        console.log('second find nbaTeams')
-        playersModel.valid(data)
+        if(typeof data === "object"){
+          console.log('收到爬取的teams数据',data.length)
+          playersModel.valid(data)
+        }else{
+            console.log('完')
+        }
     })
 })

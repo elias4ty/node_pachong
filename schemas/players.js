@@ -19,12 +19,14 @@ let playerSchema = new mongoose.Schema({
 playerSchema.statics = {
   findPlayers (arr){
      var ins = 0,that = this;
-     console.log('22')
+     console.log('没有球员数据，准备爬取...')
      return {
        goNext() {
          if(ins<arr.length){
-           console.log('ins=',ins)
+           console.log('正在爬取第',ins,'只球队的球员数据')
            that.getPlayer.call(this,that,arr[ins++].detail)
+         }else{
+            console.log('爬取球员数据已完毕,',ins)
          }
        }
      }
@@ -57,7 +59,6 @@ playerSchema.statics = {
                   players.push(playerObj);
               }
               console.log(teamName[teamName.length - 1])
-              that.goNext();
 
               var playersEntity = new playersModel({
                   teamName : teamName[teamName.length - 1],
@@ -65,18 +66,22 @@ playerSchema.statics = {
               })
 
               playersEntity.save();
+
+              that.goNext();
           })
       })
   },
   valid(ts) {
-    this.find({},(err,data) => {
-        console.log('找到',data.length,'支球队的球员')
-        if(!data.length){
-          console.log('ts=',ts.length)
-          var iterator = this.findPlayers(ts);
-          iterator.goNext();
-        }
-    })
+      this.find({},(err,data) => {
+          console.log('找到',data.length,'支球队的球员')
+          if(!data.length){
+            console.log('数据库里已经有teams数据，',ts.length)
+            var iterator = this.findPlayers(ts);
+            iterator.goNext();
+          }else{
+             console.log('数据库里已经有球员数据，不需爬取')
+          }
+      })
   }
 }
 
